@@ -151,8 +151,6 @@ function Payment () {
         )
     }
 
-    localStorage.setItem('view', JSON.stringify(cartView));
-
     return (
         <>
             <Navigation />

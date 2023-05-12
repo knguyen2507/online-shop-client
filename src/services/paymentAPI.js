@@ -215,7 +215,7 @@ const ConfirmPayment = async ({id}) => {
             localStorage.setItem('accessToken', token);
         }
     
-        const response = await axios.post(url, {
+        const response = await axios.post(url, {}, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
