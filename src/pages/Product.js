@@ -6,6 +6,10 @@ import Row from 'react-bootstrap/Row';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+// firebase
+import { firebase } from '../services/firebase';
+// api
 import { 
     RefreshToken 
 } from "../services/userAPI.js";
@@ -19,10 +23,17 @@ const title = "Product";
 function Product () {
     const {id} = useParams();
     const [product, setProduct] = useState([]);
+    const [imageUrl, setImageUrl] = useState([]);
 
     useEffect(() => {
         const getProductById = async () => {
             const product = await GetProductById({id});
+            if (process.env.REACT_APP_ENV === 'pro') {
+                const app = firebase();
+                const storage = getStorage(app);
+                const url = await getDownloadURL(ref(storage, product.image));
+                setImageUrl(url);
+            }
             setProduct(product);
         }
         getProductById();
@@ -73,6 +84,8 @@ function Product () {
             } else {
                 const accessToken = response.accessToken;
                 localStorage.setItem('accessToken', accessToken);
+                const resp = await AddProductToCart({idProduct: id});
+                alert(resp.message);
             }
         } else {
             alert(res.message);
@@ -114,13 +127,21 @@ function Product () {
                 <Row style={{marginTop: "25px", marginBottom: "25px"}}>
                     <Col sm={4}>
                         <div style={itemImage}>
-                            <img 
-                                width="300" 
-                                height="300" 
-                                crossorigin="anonymous"
-                                src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                alt="image product"
-                            ></img>
+                            {process.env.REACT_APP_ENV === 'pro' ? 
+                                <img 
+                                    width="300" 
+                                    height="300"
+                                    src={imageUrl} 
+                                    alt="image product"
+                                ></img> :
+                                <img 
+                                    width="300" 
+                                    height="300" 
+                                    crossorigin="anonymous"
+                                    src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                    alt="image product"
+                                ></img>
+                            }
                         </div>
                     </Col>
                     <Col sm={8}>

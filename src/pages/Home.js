@@ -7,17 +7,33 @@ import Col from "react-bootstrap/Col";
 import Nav from 'react-bootstrap/Nav';
 import { useState, useEffect } from "react";
 import { GetAllProducts } from "../services/productAPI.js";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+// firebase
+import { firebase } from '../services/firebase';
 
 const title = "HOME";
 
 function Home () {
     document.title = title;
     const [products, setProducts] = useState([]);
+    const [urls, setUrls] = useState([]);
+    const [load, setLoad] = useState(false);
 
     useEffect(() => {
         const getAllProducts = async () => {
             const products = await GetAllProducts();
+            if (process.env.REACT_APP_ENV === 'pro') {
+                const app = firebase();
+                const storage = getStorage(app);
+                const dict = {};
+                for (let product of products) {
+                    const url = await getDownloadURL(ref(storage, product.image));
+                    dict[product.image.toString()] = url
+                }
+                setUrls(dict)
+            }
             setProducts(products);
+            setLoad(true)
         }
         getAllProducts();
     }, [])
@@ -35,6 +51,19 @@ function Home () {
         color: "black",
         textTransform: "uppercase"
     };  
+    
+    if (load === false) {
+        return (
+            <>
+                <Navigation />
+                <Title title={title} />
+                <Container>
+                    <p style={{textAlign: "center", fontWeight: "Bold"}}>Loading...</p>
+                </Container>
+                <Footer />
+            </>
+        )
+    }
 
     return (
         <>
@@ -46,13 +75,21 @@ function Home () {
                     <Col style={{marginTop: "25px", marginBottom: "25px"}}>
                         <div style={itemImage}>
                             <Nav.Link href={"/product/" + product.id} >
-                                <img 
-                                    width="300" 
-                                    height="300" 
-                                    crossorigin="anonymous"
-                                    src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                    alt="image product"
-                                ></img>
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="300" 
+                                        height="300"
+                                        src={urls[product.image]} 
+                                        alt='image product'
+                                    ></img> :
+                                    <img 
+                                        width="300" 
+                                        height="300" 
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                        alt='image product'
+                                    ></img>
+                                }
                             </Nav.Link>
                         </div>
                         <div style={itemInfo}>

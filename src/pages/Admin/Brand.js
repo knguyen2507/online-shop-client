@@ -5,6 +5,10 @@ import Col from 'react-bootstrap/Col';
 import { useState, useEffect } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+// firebase
+import { firebase } from '../../services/firebase';
+// api
 import { 
     CreateBrand,
     DeleteBrand
@@ -28,6 +32,25 @@ function Brand(props) {
     const [warningId, setWarningId] = useState('');
     const [showView, setShowView] = useState(false);
     const [brandView, setBrandView] = useState({});
+    const [urls, setUrls] = useState([]);
+    const [load, setLoad] = useState(false);
+
+    useEffect(() => {
+        const getUrl = async () => {
+            if (process.env.REACT_APP_ENV === 'pro') {
+                const app = firebase();
+                const storage = getStorage(app);
+                const dict = {};
+                for (let brand of brands) {
+                    const url = await getDownloadURL(ref(storage, brand.image));
+                    dict[brand.image.toString()] = url
+                }
+                setUrls(dict);
+                setLoad(true);
+            }
+        }
+        getUrl();
+    }, []);
 
     if (brands.length%4 === 0) {
         brandNumberPages = Math.floor(brands.length/4);
@@ -64,14 +87,23 @@ function Brand(props) {
                         <Row style={{borderBottom: "solid 2px"}}>
                             <Col xs={9} md={6}>{brand.name}</Col>
                             <Col xs={3} md={2}>
-                                <img 
-                                    width="100" 
-                                    height="100"
-                                    style={{marginTop: "2px", marginBottom: "2px"}}
-                                    crossorigin="anonymous"
-                                    src={process.env.REACT_APP_HOST + '/' + brand.image} 
-                                    alt='image product'
-                                />
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "2px", marginBottom: "2px"}}
+                                        src={urls[brand.image]} 
+                                        alt='image brand'
+                                    /> :
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "2px", marginBottom: "2px"}}
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + brand.image} 
+                                        alt='image product'
+                                    />
+                                }
                             </Col>
                             <Col xs={6} md={4}>
                                 <Button 
@@ -104,8 +136,8 @@ function Brand(props) {
                 </>
             )
         }
-        setPaginatedItems(<PaginatedItems brands={props.brands} />);
-    }, [page]);
+        if (load) setPaginatedItems(<PaginatedItems brands={props.brands} />);
+    }, [page, load]);
 
     const div = {
         margin: "auto",
@@ -329,18 +361,31 @@ function Brand(props) {
                         placeholder="Name"
                         value={brandView.name}
                     />
-                    <img 
-                        width="100" 
-                        height="100" 
-                        style={{
-                            display: "block",
-                            marginLeft: "auto",
-                            marginRight: "auto"
-                        }}
-                        crossorigin="anonymous"
-                        src={process.env.REACT_APP_HOST + '/' + brandView.image}
-                        alt='image brand' 
-                    ></img>
+                    {process.env.REACT_APP_ENV === 'pro' ? 
+                        <img 
+                            width="100" 
+                            height="100" 
+                            style={{
+                                display: "block",
+                                marginLeft: "auto",
+                                marginRight: "auto"
+                            }}
+                            src={urls[brandView.image]} 
+                            alt='image brand' 
+                        /> :
+                        <img 
+                            width="100" 
+                            height="100" 
+                            style={{
+                                display: "block",
+                                marginLeft: "auto",
+                                marginRight: "auto"
+                            }}
+                            crossorigin="anonymous"
+                            src={process.env.REACT_APP_HOST + '/' + brandView.image}
+                            alt='image brand' 
+                        />
+                    }
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowView(false)}>

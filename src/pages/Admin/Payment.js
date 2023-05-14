@@ -5,6 +5,10 @@ import Col from 'react-bootstrap/Col';
 import { useEffect, useState } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+// firebase
+import { firebase } from '../../services/firebase';
+// api
 import { 
     RefreshToken 
 } from '../../services/userAPI.js';
@@ -29,6 +33,25 @@ function Payment(props) {
     const [warningId, setWarningId] = useState({});
     const [confirmId, setConfirmId] = useState({});
     const [user, setUser] = useState([]);
+    const [urls, setUrls] = useState([]);
+
+    useEffect(() => {
+        const getUrls = async () => {
+            if (process.env.REACT_APP_ENV === 'pro' && cartView.length > 0) {
+                const app = firebase();
+                const storage = getStorage(app);
+                const dict = {};
+                for (let product of cartView) {
+                    const url = await getDownloadURL(ref(storage, product.image));
+                    dict[product.image.toString()] = url
+                }
+                setUrls(dict)
+            } else {
+                return true
+            }
+        };
+        getUrls();
+    }, [cartView])
 
     if (payments.length === 0) {
         paymentNumberPages = 1;
@@ -234,15 +257,23 @@ function Payment(props) {
                                 <p>Name: {product.name}</p>
                                 <p>Qty: {product.qty}</p>
                                 <p>Price: {product.price}</p>
-                                <img 
-                                    width="100" 
-                                    height="100"
-                                    style={{marginTop: "10px"}}
-                                    crossorigin="anonymous"
-                                    src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                    alt='image product'
-                                />
-
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        src={urls[product.image]} 
+                                        alt='image product'
+                                    /> :
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                        alt='image product'
+                                    />
+                                }
                             </div>
                         ))}
                     </div>

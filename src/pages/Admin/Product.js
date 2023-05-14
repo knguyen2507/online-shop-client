@@ -5,6 +5,10 @@ import Col from 'react-bootstrap/Col';
 import { useEffect, useState } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+// firebase
+import { firebase } from '../../services/firebase';
+// api
 import { RefreshToken } from '../../services/userAPI.js';
 import { 
     CreateProduct,
@@ -35,6 +39,8 @@ function Product(props) {
     const [price, setPrice] = useState('');
     const [image, setImage] = useState('');
     const [details, setDetails] = useState([]);
+    const [urls, setUrls] = useState([]);
+    const [load, setLoad] = useState(false);
 
     const submitUpdate = async () => {
         if (qty === '' || price === '') {
@@ -61,8 +67,24 @@ function Product(props) {
                 window.location.reload(false);
             }
         }
-        
     };
+
+    useEffect(() => {
+        const getUrl = async () => {
+            if (process.env.REACT_APP_ENV === 'pro') {
+                const app = firebase();
+                const storage = getStorage(app);
+                const dict = {};
+                for (let product of products) {
+                    const url = await getDownloadURL(ref(storage, product.image));
+                    dict[product.image.toString()] = url
+                }
+                setUrls(dict);
+                setLoad(true);
+            }
+        }
+        getUrl();
+    }, []);
 
     const handleDelete = async () => {
         const res = await DeleteProduct({id: warningId});
@@ -176,14 +198,23 @@ function Product(props) {
                             <Col xs={9} md={6}>{product.name}</Col>
                             <Col xs={3} md={2}>{product.qty}</Col>
                             <Col xs={3} md={2}>
-                                <img 
-                                    width="100" 
-                                    height="100"
-                                    style={{marginTop: "10px"}}
-                                    crossorigin="anonymous"
-                                    src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                    alt='image product'
-                                />
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        src={urls[product.image]} 
+                                        alt='image product'
+                                    /> :
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                        alt='image product'
+                                    />
+                                }
                             </Col>
                             <Col xs={3} md={2}>
                                 <Button 
@@ -216,8 +247,8 @@ function Product(props) {
                 </>
             )
         }
-        setPaginatedItems(<PaginatedItems products={props.products} />);
-    }, [page]);
+        if (load) setPaginatedItems(<PaginatedItems products={props.products} />);
+    }, [page, load]);
 
     const div = {
         margin: "auto",
@@ -399,13 +430,21 @@ function Product(props) {
                                 onChange={e => setPrice(e.target.value)}
                             /> 
                         }
-                        <img 
-                            width="100" 
-                            height="100" 
-                            crossorigin="anonymous"
-                            src={process.env.REACT_APP_HOST + '/' + productView.image}
-                            alt='image product' 
-                        ></img>
+                        {process.env.REACT_APP_ENV === 'pro' ? 
+                            <img 
+                                width="100" 
+                                height="100"
+                                src={urls[productView.image]} 
+                                alt='image product'
+                            /> :
+                            <img 
+                                width="100" 
+                                height="100" 
+                                crossorigin="anonymous"
+                                src={process.env.REACT_APP_HOST + '/' + productView.image}
+                                alt='image product' 
+                            />
+                        }
                         {
                             updateProduct ? 
                             <input 
