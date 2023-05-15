@@ -24,6 +24,7 @@ function Product () {
     const {id} = useParams();
     const [product, setProduct] = useState([]);
     const [imageUrl, setImageUrl] = useState([]);
+    const [load, setLoad] = useState(false);
 
     useEffect(() => {
         const getProductById = async () => {
@@ -35,6 +36,7 @@ function Product () {
                 setImageUrl(url);
             }
             setProduct(product);
+            setLoad(true);
         }
         getProductById();
     }, [])
@@ -124,36 +126,42 @@ function Product () {
         <>
             <Navigation />
             <Container>
-                <Row style={{marginTop: "25px", marginBottom: "25px"}}>
-                    <Col sm={4}>
-                        <div style={itemImage}>
-                            {process.env.REACT_APP_ENV === 'pro' ? 
-                                <img 
-                                    width="300" 
-                                    height="300"
-                                    src={imageUrl} 
-                                    alt="image product"
-                                ></img> :
-                                <img 
-                                    width="300" 
-                                    height="300" 
-                                    crossorigin="anonymous"
-                                    src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                    alt="image product"
-                                ></img>
-                            }
-                        </div>
-                    </Col>
-                    <Col sm={8}>
-                        <div style={{textAlign: "left"}}>
-                            <p><span style={{fontWeight: "bold"}}>PRODUCT NAME: </span>{product.name}</p>
-                            <p><span style={{fontWeight: "bold"}}>CATEGORY: </span>{product.category}</p>
-                            <p><span style={{fontWeight: "bold"}}>BRAND: </span>{product.brand}</p>
-                            <p><span style={{fontWeight: "bold"}}>PRICE: </span>{product.price}</p>
-                            <StatusProduct qty={product.qty} />
-                        </div>
-                    </Col>
-                </Row>
+                {
+                    load === false ?
+                    <p 
+                        style={{textAlign: "center", fontWeight: "Bold"}}
+                    >Loading...</p> :
+                    <Row style={{marginTop: "25px", marginBottom: "25px"}}>
+                        <Col sm={4}>
+                            <div style={itemImage}>
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="300" 
+                                        height="300"
+                                        src={imageUrl} 
+                                        alt="image product"
+                                    ></img> :
+                                    <img 
+                                        width="300" 
+                                        height="300" 
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                        alt="image product"
+                                    ></img>
+                                }
+                            </div>
+                        </Col>
+                        <Col sm={8}>
+                            <div style={{textAlign: "left"}}>
+                                <p><span style={{fontWeight: "bold"}}>PRODUCT NAME: </span>{product.name}</p>
+                                <p><span style={{fontWeight: "bold"}}>CATEGORY: </span>{product.category}</p>
+                                <p><span style={{fontWeight: "bold"}}>BRAND: </span>{product.brand}</p>
+                                <p><span style={{fontWeight: "bold"}}>PRICE: </span>{product.price}</p>
+                                <StatusProduct qty={product.qty} />
+                            </div>
+                        </Col>
+                    </Row>
+                }
             </Container>
             <Footer />
         </>

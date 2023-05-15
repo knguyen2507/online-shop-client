@@ -3,7 +3,6 @@ import Footer from "../components/Footer.js";
 import Container from 'react-bootstrap/Container';
 import Col from "react-bootstrap/Col";
 import Row from 'react-bootstrap/Row';
-import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -33,6 +32,7 @@ function Cart () {
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [urls, setUrls] = useState([]);
+    const [load, setLoad] = useState(false);
 
     const addQtyProductToCart = async (idCart) => {
         const res = await AddQtyProductInCart({id: idCart});
@@ -188,6 +188,7 @@ function Cart () {
             } else {
                 return true
             }
+            setLoad(true);
         }
         getProducts();
     }, []);
@@ -278,19 +279,27 @@ function Cart () {
         <>
             <Navigation />
             <Container>
-                <Button 
-                    variant="warning" 
-                    style={{width: "300px"}}
-                    onClick={() => paymentCart()}
-                >PAYMENT PRODUCTS
-                </Button>
-                <Row style={{borderBottom: "solid 2px"}}>
-                    <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>NAME</p></Col>
-                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>QTY</p></Col>
-                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>IMAGE</p></Col>
-                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
-                </Row>
-                {<PaginatedItems products={products} />}
+                {
+                    load === false ?
+                    <p 
+                        style={{textAlign: "center", fontWeight: "Bold"}}
+                    >Loading...</p> :
+                    <>
+                        <Button 
+                            variant="warning" 
+                            style={{width: "300px"}}
+                            onClick={() => paymentCart()}
+                        >PAYMENT PRODUCTS
+                        </Button>
+                        <Row style={{borderBottom: "solid 2px"}}>
+                            <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>NAME</p></Col>
+                            <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>QTY</p></Col>
+                            <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>IMAGE</p></Col>
+                            <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
+                        </Row>
+                        {<PaginatedItems products={products} />}
+                    </>
+                }
             </Container>
             <Footer />
         </>

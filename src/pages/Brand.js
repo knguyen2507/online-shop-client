@@ -36,6 +36,7 @@ function Brand () {
     const [brand, setBrand] = useState([]);
     const [products, setProducts] = useState([]);
     const [urls, setUrls] = useState([]);
+    const [load, setLoad] = useState(false);
     
     useEffect(() => {
         const getBrandByName = async () => {
@@ -59,6 +60,7 @@ function Brand () {
                 setUrls(dict)
             }
             setProducts(products);
+            setLoad(true);
         }
         getProductsByBrands();
     }, [])
@@ -71,35 +73,40 @@ function Brand () {
             <Navigation />
             <Title title={title} />
             <Container>
-                <Row md={3}>
-                {console.log(`products:::`, products)}
-                {products.map(product => (
-                    <Col style={{marginTop: "25px", marginBottom: "25px"}}>
-                        <div style={itemImage}>
-                            <Nav.Link href={"/product/" + product.id} >
-                                {process.env.REACT_APP_ENV === 'pro' ? 
-                                    <img 
-                                        width="300" 
-                                        height="300"
-                                        src={urls[product.image]} 
-                                        alt='image product'
-                                    ></img> :
-                                    <img 
-                                        width="300" 
-                                        height="300" 
-                                        crossorigin="anonymous"
-                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                        alt='image product'
-                                    ></img>
-                                }
-                            </Nav.Link>
-                        </div>
-                        <div style={itemInfo}>
-                            <p>{product.name}</p>
-                        </div>
-                    </Col>
-                ))}
-                </Row>
+                {
+                    load === false ?
+                    <p 
+                        style={{textAlign: "center", fontWeight: "Bold"}}
+                    >Loading...</p> :
+                    <Row md={3}>
+                        {products.map(product => (
+                            <Col style={{marginTop: "25px", marginBottom: "25px"}}>
+                                <div style={itemImage}>
+                                    <Nav.Link href={"/product/" + product.id} >
+                                        {process.env.REACT_APP_ENV === 'pro' ? 
+                                            <img 
+                                                width="300" 
+                                                height="300"
+                                                src={urls[product.image]} 
+                                                alt='image product'
+                                            ></img> :
+                                            <img 
+                                                width="300" 
+                                                height="300" 
+                                                crossorigin="anonymous"
+                                                src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                                alt='image product'
+                                            ></img>
+                                        }
+                                    </Nav.Link>
+                                </div>
+                                <div style={itemInfo}>
+                                    <p>{product.name}</p>
+                                </div>
+                            </Col>
+                        ))}
+                    </Row>
+                }
             </Container>
             <Footer />
         </>

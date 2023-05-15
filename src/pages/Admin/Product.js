@@ -80,8 +80,8 @@ function Product(props) {
                     dict[product.image.toString()] = url
                 }
                 setUrls(dict);
-                setLoad(true);
             }
+            setLoad(true);
         }
         getUrl();
     }, []);
@@ -337,282 +337,290 @@ function Product(props) {
 
     return (
         <>
-            <Form className="d-flex justify-content-center" style={{margin: "auto"}}>
-                <Form.Control
-                    style={{marginTop:"2px", width: "400px"}}
-                    value={key}
-                    type="search"
-                    placeholder="Search"
-                    className="me-2"
-                    aria-label="Search"
-                    onChange={e => setKey(e.target.value)}
-                />
-                <Button variant="dark" size="sm" onClick={searchBtn}>SEARCH</Button>
-            </Form >
-            <Button 
-                variant="warning" 
-                style={{width: "300px"}}
-                onClick={() => setShow(true)}
-            >ADD NEW PRODUCT
-            </Button>
-            <Modal show={showView} onHide={() => {
-                setUpdateProduct(false)
-                setShowView(false)
-            }}>
-                <Modal.Header closeButton>
-                    <Modal.Title>PRODUCT VIEW</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form >
-                        <input 
-                            style={inputView} 
-                            type="text" 
-                            name="id" 
-                            placeholder="Id"
-                            value={productView.id}
+            {
+                load === false ?
+                <p 
+                    style={{textAlign: "center", fontWeight: "Bold"}}
+                >Loading...</p> :
+                <>
+                    <Form className="d-flex justify-content-center" style={{margin: "auto"}}>
+                        <Form.Control
+                            style={{marginTop:"2px", width: "400px"}}
+                            value={key}
+                            type="search"
+                            placeholder="Search"
+                            className="me-2"
+                            aria-label="Search"
+                            onChange={e => setKey(e.target.value)}
                         />
-                        <input 
-                            style={inputView} 
-                            type="text" 
-                            name="name" 
-                            placeholder="Name"
-                            value={productView.name}
-                        />
-                        {
-                            updateProduct ? 
-                            <input 
-                                style={inputView} 
-                                type="text" 
-                                name="qty" 
-                                placeholder={`old qty: ${productView.qty}`}
-                                onChange={e => setQty(e.target.value)}
-                            /> 
-                            : 
-                            <input 
-                                style={inputView} 
-                                type="text" 
-                                name="qty" 
-                                placeholder={"Qty"}
-                                value={productView.qty}
-                                onChange={e => setQty(e.target.value)}
-                            /> 
-                        }
-                        <input 
-                            style={inputView} 
-                            type="text" 
-                            name="brand" 
-                            placeholder="Brand"
-                            value={productView.brand}
-                        />
-                        <input 
-                            style={inputView} 
-                            type="text" 
-                            name="category" 
-                            placeholder="Category"
-                            value={productView.category}
-                        />
-                        {
-                            updateProduct ? 
-                            <input 
-                                style={inputView} 
-                                type="text" 
-                                name="price" 
-                                placeholder={`old price: ${productView.price}`}
-                                onChange={e => setPrice(e.target.value)}
-                            /> 
-                            : 
-                            <input 
-                                style={inputView} 
-                                type="text" 
-                                name="price" 
-                                placeholder={"Price"}
-                                value={productView.price}
-                                onChange={e => setPrice(e.target.value)}
-                            /> 
-                        }
-                        {process.env.REACT_APP_ENV === 'pro' ? 
-                            <img 
-                                width="100" 
-                                height="100"
-                                src={urls[productView.image]} 
-                                alt='image product'
-                            /> :
-                            <img 
-                                width="100" 
-                                height="100" 
-                                crossorigin="anonymous"
-                                src={process.env.REACT_APP_HOST + '/' + productView.image}
-                                alt='image product' 
-                            />
-                        }
-                        {
-                            updateProduct ? 
-                            <input 
-                                style={inputView} 
-                                type="text" 
-                                name="details" 
-                                placeholder="Details"
-                                onChange={e => setDetails(e.target.value)}
-                            /> 
-                            : 
-                            <input 
-                                style={inputView} 
-                                type="text" 
-                                name="details" 
-                                placeholder={"Details"}
-                                value={productView.details}
-                                onChange={e => setDetails(e.target.value)}
-                            /> 
-                        }
-                        <Button 
-                            variant="info" 
-                            style={{width: "150px"}}
-                            onClick={() => {
-                                if (updateProduct) {
-                                    submitUpdate();
-                                } else {
-                                    setUpdateProduct(true);
-                                }
-                            }}
-                        >{updateProduct ? 'UPDATE' : 'CHANGE PRODUCT'}
-                        </Button>
-                    </form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
+                        <Button variant="dark" size="sm" onClick={searchBtn}>SEARCH</Button>
+                    </Form >
+                    <Button 
+                        variant="warning" 
+                        style={{width: "300px"}}
+                        onClick={() => setShow(true)}
+                    >ADD NEW PRODUCT
+                    </Button>
+                    <Modal show={showView} onHide={() => {
                         setUpdateProduct(false)
                         setShowView(false)
                     }}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={showWarning} onHide={() => setShowWarning(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>WARNING</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <p>Are you sure that you want to delete this Product</p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="danger" onClick={() => handleDelete()}>
-                        Yes
-                    </Button>
-                    <Button variant="secondary" onClick={() => setShowWarning(false)}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={show} onHide={() => {
-                setErrStatus(false)
-                setCreateStatus(false)
-                setShow(false)
-            }}>
-                <Modal.Header closeButton>
-                    <Modal.Title>ADD NEW PRODUCT</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div style={div}>
-                        <form onSubmit={handleSubmit} enctype="multipart/form-data">
-                            <input 
-                                style={input} 
-                                type="text" 
-                                name="id" 
-                                placeholder="Id"
-                                onChange={e => setId(e.target.value)}
-                            />
-                            <input 
-                                style={input} 
-                                type="text" 
-                                name="name" 
-                                placeholder="Name"
-                                onChange={e => setName(e.target.value)}
-                            />
-                            <input 
-                                style={input} 
-                                type="text" 
-                                name="qty" 
-                                placeholder="Qty"
-                                onChange={e => setQty(e.target.value)}
-                            />
-                            <select 
-                                style={input}  
-                                id="category" 
-                                onChange={e => setCategory(e.target.value)}
-                            >
-                                <option value="0">Category</option>
-                                {
-                                    props.categories.map(cate => (
-                                        <option value={cate.name}>{cate.name}</option>
-                                    ))
-                                }
-                            </select>
-                            <select style={input}  
-                                id="brand" 
-                                onChange={e => setBrand(e.target.value)}
-                            >
-                                <option value="0">Brand</option>
-                                {
-                                    props.brands.map(b => (
-                                        <option value={b.name}>{b.name}</option>
-                                    ))
-                                }
-                            </select>
-                            <input 
-                                style={input} 
-                                type="text" 
-                                name="price" 
-                                placeholder="Price"
-                                onChange={e => setPrice(e.target.value)}
-                            />
-                            <div>
+                        <Modal.Header closeButton>
+                            <Modal.Title>PRODUCT VIEW</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <form >
                                 <input 
-                                    style={input} 
-                                    type="file" 
-                                    name="image"
-                                    onChange={e => setImage(e.target.files[0])}
+                                    style={inputView} 
+                                    type="text" 
+                                    name="id" 
+                                    placeholder="Id"
+                                    value={productView.id}
                                 />
-                            </div>
-                            <input 
-                                style={input} 
-                                type="text" 
-                                name="details" 
-                                placeholder="Details"
-                                onChange={e => setDetails(e.target.value)}
-                            />
-                            <input style={button} type="submit" value="Add Product" />
-                        </form>
-                    </div>
-                    {errStatus ? ErrorMessage() : (createStatus ? SuccessMessage() : true)}
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {
+                                <input 
+                                    style={inputView} 
+                                    type="text" 
+                                    name="name" 
+                                    placeholder="Name"
+                                    value={productView.name}
+                                />
+                                {
+                                    updateProduct ? 
+                                    <input 
+                                        style={inputView} 
+                                        type="text" 
+                                        name="qty" 
+                                        placeholder={`old qty: ${productView.qty}`}
+                                        onChange={e => setQty(e.target.value)}
+                                    /> 
+                                    : 
+                                    <input 
+                                        style={inputView} 
+                                        type="text" 
+                                        name="qty" 
+                                        placeholder={"Qty"}
+                                        value={productView.qty}
+                                        onChange={e => setQty(e.target.value)}
+                                    /> 
+                                }
+                                <input 
+                                    style={inputView} 
+                                    type="text" 
+                                    name="brand" 
+                                    placeholder="Brand"
+                                    value={productView.brand}
+                                />
+                                <input 
+                                    style={inputView} 
+                                    type="text" 
+                                    name="category" 
+                                    placeholder="Category"
+                                    value={productView.category}
+                                />
+                                {
+                                    updateProduct ? 
+                                    <input 
+                                        style={inputView} 
+                                        type="text" 
+                                        name="price" 
+                                        placeholder={`old price: ${productView.price}`}
+                                        onChange={e => setPrice(e.target.value)}
+                                    /> 
+                                    : 
+                                    <input 
+                                        style={inputView} 
+                                        type="text" 
+                                        name="price" 
+                                        placeholder={"Price"}
+                                        value={productView.price}
+                                        onChange={e => setPrice(e.target.value)}
+                                    /> 
+                                }
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        src={urls[productView.image]} 
+                                        alt='image product'
+                                    /> :
+                                    <img 
+                                        width="100" 
+                                        height="100" 
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + productView.image}
+                                        alt='image product' 
+                                    />
+                                }
+                                {
+                                    updateProduct ? 
+                                    <input 
+                                        style={inputView} 
+                                        type="text" 
+                                        name="details" 
+                                        placeholder="Details"
+                                        onChange={e => setDetails(e.target.value)}
+                                    /> 
+                                    : 
+                                    <input 
+                                        style={inputView} 
+                                        type="text" 
+                                        name="details" 
+                                        placeholder={"Details"}
+                                        value={productView.details}
+                                        onChange={e => setDetails(e.target.value)}
+                                    /> 
+                                }
+                                <Button 
+                                    variant="info" 
+                                    style={{width: "150px"}}
+                                    onClick={() => {
+                                        if (updateProduct) {
+                                            submitUpdate();
+                                        } else {
+                                            setUpdateProduct(true);
+                                        }
+                                    }}
+                                >{updateProduct ? 'UPDATE' : 'CHANGE PRODUCT'}
+                                </Button>
+                            </form>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => {
+                                setUpdateProduct(false)
+                                setShowView(false)
+                            }}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Modal show={showWarning} onHide={() => setShowWarning(false)}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>WARNING</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <p>Are you sure that you want to delete this Product</p>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="danger" onClick={() => handleDelete()}>
+                                Yes
+                            </Button>
+                            <Button variant="secondary" onClick={() => setShowWarning(false)}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Modal show={show} onHide={() => {
                         setErrStatus(false)
                         setCreateStatus(false)
                         setShow(false)
                     }}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-            <Row style={{borderBottom: "solid 2px"}}>
-                <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>NAME</p></Col>
-                <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>QTY</p></Col>
-                <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>IMAGE</p></Col>
-                <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTIONS</p></Col>
-            </Row>
-            {page === 0 ? <p>page: {page}</p> : paginatedItems}
-            <Button 
-                variant="primary" 
-                style={{width: "200px"}} 
-                onClick={() => page === 1 ? setPage(page) : setPage(page - 1)}
-            >Previous</Button>
-            <p style={{display: "inline-block"}}>{page}</p>
-            <Button 
-                variant="success" 
-                style={{width: "200px"}} 
-                onClick={() => page === productNumberPages ? setPage(page) : setPage(page + 1)}
-            >Next</Button>
+                        <Modal.Header closeButton>
+                            <Modal.Title>ADD NEW PRODUCT</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <div style={div}>
+                                <form onSubmit={handleSubmit} enctype="multipart/form-data">
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        name="id" 
+                                        placeholder="Id"
+                                        onChange={e => setId(e.target.value)}
+                                    />
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        name="name" 
+                                        placeholder="Name"
+                                        onChange={e => setName(e.target.value)}
+                                    />
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        name="qty" 
+                                        placeholder="Qty"
+                                        onChange={e => setQty(e.target.value)}
+                                    />
+                                    <select 
+                                        style={input}  
+                                        id="category" 
+                                        onChange={e => setCategory(e.target.value)}
+                                    >
+                                        <option value="0">Category</option>
+                                        {
+                                            props.categories.map(cate => (
+                                                <option value={cate.name}>{cate.name}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    <select style={input}  
+                                        id="brand" 
+                                        onChange={e => setBrand(e.target.value)}
+                                    >
+                                        <option value="0">Brand</option>
+                                        {
+                                            props.brands.map(b => (
+                                                <option value={b.name}>{b.name}</option>
+                                            ))
+                                        }
+                                    </select>
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        name="price" 
+                                        placeholder="Price"
+                                        onChange={e => setPrice(e.target.value)}
+                                    />
+                                    <div>
+                                        <input 
+                                            style={input} 
+                                            type="file" 
+                                            name="image"
+                                            onChange={e => setImage(e.target.files[0])}
+                                        />
+                                    </div>
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        name="details" 
+                                        placeholder="Details"
+                                        onChange={e => setDetails(e.target.value)}
+                                    />
+                                    <input style={button} type="submit" value="Add Product" />
+                                </form>
+                            </div>
+                            {errStatus ? ErrorMessage() : (createStatus ? SuccessMessage() : true)}
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={() => {
+                                setErrStatus(false)
+                                setCreateStatus(false)
+                                setShow(false)
+                            }}>
+                                Close
+                            </Button>
+                        </Modal.Footer>
+                    </Modal>
+                    <Row style={{borderBottom: "solid 2px"}}>
+                        <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>NAME</p></Col>
+                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>QTY</p></Col>
+                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>IMAGE</p></Col>
+                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTIONS</p></Col>
+                    </Row>
+                    {page === 0 ? <p>page: {page}</p> : paginatedItems}
+                    <Button 
+                        variant="primary" 
+                        style={{width: "200px"}} 
+                        onClick={() => page === 1 ? setPage(page) : setPage(page - 1)}
+                    >Previous</Button>
+                    <p style={{display: "inline-block"}}>{page}</p>
+                    <Button 
+                        variant="success" 
+                        style={{width: "200px"}} 
+                        onClick={() => page === productNumberPages ? setPage(page) : setPage(page + 1)}
+                    >Next</Button>
+                </>
+            }
         </>
     )
 }
