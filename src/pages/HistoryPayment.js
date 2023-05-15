@@ -74,8 +74,6 @@ function HistoryPayment () {
                     }
                 }
                 setUrls(dict)
-            } else {
-                return true
             }
             setLoad(true);
         };

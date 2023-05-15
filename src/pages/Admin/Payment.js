@@ -47,8 +47,6 @@ function Payment(props) {
                     dict[product.image.toString()] = url
                 }
                 setUrls(dict)
-            } else {
-                return true
             }
             setLoad(true);
         };

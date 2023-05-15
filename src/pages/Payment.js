@@ -75,8 +75,6 @@ function Payment () {
                     }
                 }
                 setUrls(dict)
-            } else {
-                return true
             }
             setLoad(true)
         };
