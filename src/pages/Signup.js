@@ -56,6 +56,7 @@ function Signup () {
     };
 
     const ResendOtp = async () => {
+        alert("OTP has been sent")
         const res = await Register(username, password, email, name, repeatPassword);
         
         if (res.code >= 400) {
@@ -67,7 +68,6 @@ function Signup () {
             setOtpStatus(true);
             setPassword('');
             setRepeatPassword('');
-            alert("OTP has been sent")
         }
     }
 

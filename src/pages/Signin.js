@@ -89,6 +89,16 @@ function Signin () {
 
     const ResendOtp = async () => {
         alert("OTP has been sent")
+        const res = await ForgotPassord(email, newPassword, repeatPassword);
+
+        if (res.code >= 400) {
+            setModalErrStatus(true);
+            setModalErrorMsg(res.message);
+        } else {
+            setModalErrStatus(false);
+            setModalErrorMsg('');
+            setOtpStatus(true);
+        }
     }
 
     const container = {
@@ -144,31 +154,6 @@ function Signin () {
         return (
             <div style={errDiv}>
                 <p style={err}>{msg}</p>
-            </div>
-        )
-    }
-
-    function SuccessMessage () {
-        const successDiv = {
-            margin: "auto",
-            borderRadius: "5px",
-            backgroundColor: "#14A44D",
-            padding: "20px",
-            width: "300px",
-            height: "80px",
-            marginBottom: "20px"
-        }
-
-        const success = {
-            textAlign: "center",
-            margin: "auto",
-            color: "white",
-            fontSize: "15px"
-        };
-
-        return (
-            <div style={successDiv}>
-                <p style={success}>Your password has been created</p>
             </div>
         )
     }
