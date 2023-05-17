@@ -169,34 +169,34 @@ const Register = async (username, password, email, name, re_password) => {
         return res.metadata;
     } catch (error) {
         return error.response.data;
-    }
-    
+    }  
 };
 
-const CheckAccessAdminPage = async () => {
-    try {
-        const path = `/user/check-access-admin-page`;
-        const url = host + path;
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            const resp = await RefreshToken();
-            token = resp.accessToken;
-            localStorage.setItem('accessToken', token);
-        }
-        const id = localStorage.getItem('idUser');
+const RegisterSendOtp = async (otp, username, password, email, name) => {
+    const path = '/user/register/verify-otp';
+    const url = host + path;
 
-        const response = await axios.post(url, {id: id}, {
+    const payload = {
+        otp: otp,
+        username: username, 
+        password: password,
+        email: email,
+        name: name
+    };
+
+    try {
+        const response = await axios.post(url, payload, {
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json'
             },
         });
         const res = response.data;
     
-        return res;
+        return res.metadata;
     } catch (error) {
         return error.response.data;
     }
+    
 };
 
 const CreateUserByAdmin = async ({name, username, password, re_password, email, role}) => {
@@ -257,7 +257,7 @@ export {
     LogOut,
     RefreshToken,
     Register,
-    CheckAccessAdminPage,
+    RegisterSendOtp,
     CreateUserByAdmin,
     DeleteUser
 }

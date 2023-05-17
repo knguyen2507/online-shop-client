@@ -3,8 +3,13 @@ import Title from "../components/Title.js";
 import Footer from "../components/Footer.js";
 import Container from 'react-bootstrap/Container';
 import { useState } from "react";
-import { Login } from "../services/userAPI.js";
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 import Cookies from 'js-cookie';
+// api
+import { 
+    Login 
+} from "../services/userAPI.js";
 
 const title = "Login Page";
 
@@ -13,8 +18,15 @@ function Signin () {
 
     const [errStatus, setErrStatus] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [showForgot, setShowForgot] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [repeatPassword, setRepeatPassword] = useState('');
+    const [otp, setOtp] = useState('');
+    const [otpStatus, setOtpStatus] = useState(false);
+    const [status, setStatus] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -36,6 +48,43 @@ function Signin () {
             window.location.href = '/';
         }
     };
+
+    const ForgotPassord = () => {
+        setShowForgot(true)
+    }
+
+    const handleSendOtp = async () => {
+        // const res = await DeleteBrand({id: warningId});
+        // if (res.code >= 400 && res.message !== 'jwt expired') {
+        //     alert(res.message);
+        // } else if (res.code >= 400 && res.message === 'jwt expired') {
+        //     const response = await RefreshToken();
+        //     if (response.code >= 400) {
+        //         alert(response.message);
+        //         localStorage.removeItem('accessToken');
+        //         localStorage.removeItem('idUser');
+        //         localStorage.removeItem('nameUser');
+        //         localStorage.removeItem('role');
+        //         Cookies.remove('refreshToken');
+        //     } else {
+        //         const accessToken = response.accessToken;
+        //         localStorage.setItem('accessToken', accessToken);
+        //     }
+        // } else {
+        //     alert(res.message);
+        //     window.location.reload(false);
+        // }
+        alert('Verify OTP')
+    };
+
+    const submitPassword = async () => {
+        setOtpStatus(true)
+        alert('Send OTP')
+    }
+
+    const ResendOtp = async () => {
+        alert("OTP has been sent")
+    }
 
     const container = {
         borderRadius: "5px",
@@ -94,11 +143,108 @@ function Signin () {
         )
     }
 
+    function SuccessMessage () {
+        const successDiv = {
+            margin: "auto",
+            borderRadius: "5px",
+            backgroundColor: "#14A44D",
+            padding: "20px",
+            width: "300px",
+            height: "80px",
+            marginBottom: "20px"
+        }
+
+        const success = {
+            textAlign: "center",
+            margin: "auto",
+            color: "white",
+            fontSize: "15px"
+        };
+
+        return (
+            <div style={successDiv}>
+                <p style={success}>Your password has been created</p>
+            </div>
+        )
+    }
+
     return (
         <>
             <Navigation />
             <Title title={title} />
             <Container style={container} >
+                <Modal show={showForgot} onHide={() => setShowForgot(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>NEW PASSWORD</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {
+                            otpStatus ?
+                            <div style={div}>
+                                <form onSubmit={handleSendOtp}>
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        id="otp"
+                                        name="otp" 
+                                        placeholder="Otp"
+                                        onChange={e => setOtp(e.target.value)}
+                                        value={otp}
+                                    />
+                                    <p onClick={ResendOtp}><a>Resend OTP</a></p>
+                                    <input style={button} type="submit" value="Send OTP" />
+                                </form>
+                            </div> :
+                            <div style={div}>
+                                <form onSubmit={submitPassword}>
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        id="email"
+                                        name="email" 
+                                        placeholder="Email"
+                                        onChange={e => setEmail(e.target.value)}
+                                        value={email}
+                                    />
+                                    <input 
+                                        style={input} 
+                                        type="text" 
+                                        id="username"
+                                        name="username" 
+                                        placeholder="Username"
+                                        onChange={e => setUsername(e.target.value)}
+                                        value={username}
+                                    />
+                                    <input 
+                                        style={input} 
+                                        type="password" 
+                                        id="newPassword"
+                                        name="newPassword" 
+                                        placeholder="New Password"
+                                        onChange={e => setNewPassword(e.target.value)}
+                                        value={newPassword}
+                                    />
+                                    <input 
+                                        style={input} 
+                                        type="password" 
+                                        id="re-password"
+                                        name="re-password" 
+                                        placeholder="Repeat Password"
+                                        onChange={e => setRepeatPassword(e.target.value)}
+                                        value={repeatPassword}
+                                    />
+                                    <input style={button} type="submit" value="Create New" />
+                                </form>
+                            </div>
+                        }
+                        {errStatus ? ErrorMessage() : (status ? SuccessMessage() : true)}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="danger" onClick={() => setShowForgot(false)}>
+                            Yes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
                 <div style={div}>
                     <form onSubmit={handleSubmit}>
                         <input 
@@ -115,6 +261,7 @@ function Signin () {
                             placeholder="Password"
                             onChange={e => setPassword(e.target.value)}
                         />
+                        <p style={{marginLeft: "178px", fontSize: "15px", marginBottom:"2px", color:"blue"}} onClick={ForgotPassord}><a>Forgot Password</a></p>
                         <span style={{marginLeft: "178px", fontSize: "15px"}}><a href="/register">I don't have an account</a></span>
                         <input style={button} type="submit" value="Login" />
                     </form>
