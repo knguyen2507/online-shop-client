@@ -172,13 +172,12 @@ const Register = async (username, password, email, name, re_password) => {
     }  
 };
 
-const RegisterSendOtp = async (otp, username, password, email, name) => {
+const RegisterSendOtp = async (otp, password, email, name) => {
     const path = '/user/register/verify-otp';
     const url = host + path;
 
     const payload = {
         otp: otp,
-        username: username, 
         password: password,
         email: email,
         name: name
@@ -196,7 +195,82 @@ const RegisterSendOtp = async (otp, username, password, email, name) => {
     } catch (error) {
         return error.response.data;
     }
+};
+
+const ForgotPassord = async (email, newPassword, repeatPassword) => {
+    const path = '/user/forgot-password';
+    const url = host + path;
+
+    const payload = {
+        email: email,
+        password: newPassword,
+        re_password: repeatPassword
+    };
+
+    try {
+        const response = await axios.post(url, payload, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        const res = response.data;
     
+        return res.metadata;
+    } catch (error) {
+        return error.response.data;
+    }  
+};
+
+const PasswordSendOtp = async (otp, email, newPassword, repeatPassword) => {
+    const path = '/user/forgot-password/verify-otp';
+    const url = host + path;
+
+    const payload = {
+        otp: otp,
+        email: email,
+        password: newPassword,
+        re_password: repeatPassword
+    };
+
+    try {
+        const response = await axios.post(url, payload, {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }
+};
+
+const ChangePassword = async (id, currentPassword, password, repeatPassword) => {
+    const path = `/user/change-password/${id}`;
+    const url = host + path;
+
+    const payload = {
+        cur_password: currentPassword,
+        password: password,
+        re_password: repeatPassword
+    };
+    let token = localStorage.getItem('accessToken');
+    if (!token) {
+        const resp = await RefreshToken();
+        token = resp.accessToken;
+        localStorage.setItem('accessToken', token);
+    }
+
+    try {
+        const response = await axios.post(url, payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+        return response.data;
+    } catch (error) {
+        return error.response.data;
+    }  
 };
 
 const CreateUserByAdmin = async ({name, username, password, re_password, email, role}) => {
@@ -258,6 +332,9 @@ export {
     RefreshToken,
     Register,
     RegisterSendOtp,
+    ForgotPassord,
+    PasswordSendOtp,
+    ChangePassword,
     CreateUserByAdmin,
     DeleteUser
 }

@@ -8,7 +8,9 @@ import Button from 'react-bootstrap/Button';
 import Cookies from 'js-cookie';
 // api
 import { 
-    Login 
+    Login,
+    ForgotPassord,
+    PasswordSendOtp 
 } from "../services/userAPI.js";
 
 const title = "Login Page";
@@ -18,6 +20,8 @@ function Signin () {
 
     const [errStatus, setErrStatus] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [modalErrStatus, setModalErrStatus] = useState(false);
+    const [modalErrorMsg, setModalErrorMsg] = useState('');
     const [email, setEmail] = useState('');
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -26,7 +30,6 @@ function Signin () {
     const [repeatPassword, setRepeatPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [otpStatus, setOtpStatus] = useState(false);
-    const [status, setStatus] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -49,37 +52,39 @@ function Signin () {
         }
     };
 
-    const ForgotPassord = () => {
+    const ShowForm = () => {
         setShowForgot(true)
     }
 
-    const handleSendOtp = async () => {
-        // const res = await DeleteBrand({id: warningId});
-        // if (res.code >= 400 && res.message !== 'jwt expired') {
-        //     alert(res.message);
-        // } else if (res.code >= 400 && res.message === 'jwt expired') {
-        //     const response = await RefreshToken();
-        //     if (response.code >= 400) {
-        //         alert(response.message);
-        //         localStorage.removeItem('accessToken');
-        //         localStorage.removeItem('idUser');
-        //         localStorage.removeItem('nameUser');
-        //         localStorage.removeItem('role');
-        //         Cookies.remove('refreshToken');
-        //     } else {
-        //         const accessToken = response.accessToken;
-        //         localStorage.setItem('accessToken', accessToken);
-        //     }
-        // } else {
-        //     alert(res.message);
-        //     window.location.reload(false);
-        // }
-        alert('Verify OTP')
+    const handleSendOtp = async (e) => {
+        e.preventDefault();
+
+        const res = await PasswordSendOtp(otp, email, newPassword, repeatPassword);
+        
+        if (res.code >= 400) {
+            setModalErrStatus(true);
+            setModalErrorMsg(res.message);
+        } else {
+            setModalErrStatus(false);
+            setModalErrorMsg('');
+            setShowForgot(false);
+            alert(res.message);
+        }
     };
 
-    const submitPassword = async () => {
-        setOtpStatus(true)
-        alert('Send OTP')
+    const submitPassword = async (e) => {
+        e.preventDefault();
+
+        const res = await ForgotPassord(email, newPassword, repeatPassword);
+        
+        if (res.code >= 400) {
+            setModalErrStatus(true);
+            setModalErrorMsg(res.message);
+        } else {
+            setModalErrStatus(false);
+            setModalErrorMsg('');
+            setOtpStatus(true);
+        }
     }
 
     const ResendOtp = async () => {
@@ -118,7 +123,7 @@ function Signin () {
         borderRadius: "5px"
     }
 
-    function ErrorMessage () {
+    function ErrorMessage ({msg}) {
         const errDiv = {
             margin: "auto",
             borderRadius: "5px",
@@ -138,7 +143,7 @@ function Signin () {
 
         return (
             <div style={errDiv}>
-                <p style={err}>{errorMsg}</p>
+                <p style={err}>{msg}</p>
             </div>
         )
     }
@@ -208,15 +213,6 @@ function Signin () {
                                     />
                                     <input 
                                         style={input} 
-                                        type="text" 
-                                        id="username"
-                                        name="username" 
-                                        placeholder="Username"
-                                        onChange={e => setUsername(e.target.value)}
-                                        value={username}
-                                    />
-                                    <input 
-                                        style={input} 
                                         type="password" 
                                         id="newPassword"
                                         name="newPassword" 
@@ -237,7 +233,7 @@ function Signin () {
                                 </form>
                             </div>
                         }
-                        {errStatus ? ErrorMessage() : (status ? SuccessMessage() : true)}
+                        {modalErrStatus ? ErrorMessage({msg: modalErrorMsg}) : true}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="danger" onClick={() => setShowForgot(false)}>
@@ -261,12 +257,12 @@ function Signin () {
                             placeholder="Password"
                             onChange={e => setPassword(e.target.value)}
                         />
-                        <p style={{marginLeft: "178px", fontSize: "15px", marginBottom:"2px", color:"blue"}} onClick={ForgotPassord}><a>Forgot Password</a></p>
+                        <p style={{marginLeft: "178px", fontSize: "15px", marginBottom:"2px", color:"blue"}} onClick={ShowForm}><a>Forgot Password</a></p>
                         <span style={{marginLeft: "178px", fontSize: "15px"}}><a href="/register">I don't have an account</a></span>
                         <input style={button} type="submit" value="Login" />
                     </form>
                 </div>
-                {errStatus && ErrorMessage()}
+                {errStatus && ErrorMessage({msg: errorMsg})}
             </Container>
             <Footer />
         </>

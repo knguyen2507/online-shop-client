@@ -78,9 +78,11 @@ function Navigation () {
                                 <NavDropdown.Item href={`/user/history-payment/${localStorage.getItem('idUser')}`}>
                                     Payment History
                                 </NavDropdown.Item>
+                                <NavDropdown.Item href={"/logout"}>
+                                    Sign Out
+                                </NavDropdown.Item>
                             </NavDropdown>
                         </Nav>
-                        <Nav.Link href="/logout"><p style={tag_p} className="font-weight-bold fs-4">SIGN OUT</p></Nav.Link>
                         <Nav.Link href={`/user/cart/${localStorage.getItem('idUser')}`}>
                             <MDBIcon color='light' icon='shopping-basket' className='me-3' size='2x' style={{margin: "10px"}} />
                         </Nav.Link>
