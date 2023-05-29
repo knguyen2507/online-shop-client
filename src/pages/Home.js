@@ -78,6 +78,7 @@ function Home () {
                                                 <img 
                                                     width="300" 
                                                     height="300"
+                                                    crossorigin="anonymous"
                                                     src={process.env.REACT_APP_HOST + '/' + product.image} 
                                                     alt='image product'
                                                 ></img> :
