@@ -2,6 +2,7 @@ import Navigation from "../components/Navigation.js";
 import Title from "../components/Title.js";
 import Footer from "../components/Footer.js";
 import Container from 'react-bootstrap/Container';
+import Modal from 'react-bootstrap/Modal';
 import { useState } from "react";
 import { 
     Register,
@@ -23,11 +24,13 @@ function Signup () {
     const [repeatPassword, setRepeatPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [otpStatus, setOtpStatus] = useState(false);
+    const [otpLoading, setOtpLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setOtpLoading(true)
 
-        const res = await Register(username, password, email, name, repeatPassword);
+        const res = await Register({username, password, email, name, repeatPassword});
         
         if (res.code >= 400) {
             setErrStatus(true);
@@ -37,12 +40,13 @@ function Signup () {
             setErrorMsg('');
             setOtpStatus(true);
         }
+        setOtpLoading(false)
     };
 
     const handleSendOtp = async (e) => {
         e.preventDefault();
 
-        const res = await RegisterSendOtp(otp, username, password, email, name);
+        const res = await RegisterSendOtp({otp, username, password, email, name});
         
         if (res.code >= 400) {
             setErrStatus(true);
@@ -56,8 +60,8 @@ function Signup () {
     };
 
     const ResendOtp = async () => {
-        alert("OTP has been sent")
-        const res = await Register(username, password, email, name, repeatPassword);
+        setOtpLoading(true)
+        const res = await Register({username, password, email, name, repeatPassword});
         
         if (res.code >= 400) {
             setErrStatus(true);
@@ -69,6 +73,7 @@ function Signup () {
             setPassword('');
             setRepeatPassword('');
         }
+        setOtpLoading(false)
     }
 
     const container = {
@@ -158,6 +163,16 @@ function Signup () {
             <Navigation />
             <Title title={title} />
             <Container style={container} >
+                <Modal show={otpLoading} onHide={() => setOtpLoading(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>LOADING</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>OTP is being sent...</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    </Modal.Footer>
+                </Modal>
                 {
                     otpStatus ?
                     <div style={div}>

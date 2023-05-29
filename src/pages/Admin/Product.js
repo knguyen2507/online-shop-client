@@ -391,6 +391,7 @@ function Product(props) {
                                         type="text" 
                                         name="qty" 
                                         placeholder={`old qty: ${productView.qty}`}
+                                        value={qty}
                                         onChange={e => setQty(e.target.value)}
                                     /> 
                                     : 
@@ -424,6 +425,7 @@ function Product(props) {
                                         type="text" 
                                         name="price" 
                                         placeholder={`old price: ${productView.price}`}
+                                        value={price}
                                         onChange={e => setPrice(e.target.value)}
                                     /> 
                                     : 
@@ -458,6 +460,7 @@ function Product(props) {
                                         type="text" 
                                         name="details" 
                                         placeholder="Details"
+                                        value={details}
                                         onChange={e => setDetails(e.target.value)}
                                     /> 
                                     : 

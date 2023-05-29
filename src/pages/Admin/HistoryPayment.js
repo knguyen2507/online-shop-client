@@ -180,6 +180,7 @@ function Payment(props) {
                         <Modal.Body>
                             <div>
                                 <p>User ID: {user._id}</p>
+                                <p>Username: {user.username}</p>
                                 <p style={{borderBottom: "solid 2px"}}>Name User: {user.name}</p>
                                 {cartView.map(product => (
                                     <div style={{borderBottom: "solid 2px"}}>

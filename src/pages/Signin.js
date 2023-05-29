@@ -30,6 +30,7 @@ function Signin () {
     const [repeatPassword, setRepeatPassword] = useState('');
     const [otp, setOtp] = useState('');
     const [otpStatus, setOtpStatus] = useState(false);
+    const [otpLoading, setOtpLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -59,7 +60,7 @@ function Signin () {
     const handleSendOtp = async (e) => {
         e.preventDefault();
 
-        const res = await PasswordSendOtp(otp, email, newPassword, repeatPassword);
+        const res = await PasswordSendOtp({otp, email, newPassword, repeatPassword});
         
         if (res.code >= 400) {
             setModalErrStatus(true);
@@ -74,8 +75,9 @@ function Signin () {
 
     const submitPassword = async (e) => {
         e.preventDefault();
+        setOtpLoading(true)
 
-        const res = await ForgotPassord(email, newPassword, repeatPassword);
+        const res = await ForgotPassord({email, newPassword, repeatPassword});
         
         if (res.code >= 400) {
             setModalErrStatus(true);
@@ -85,11 +87,12 @@ function Signin () {
             setModalErrorMsg('');
             setOtpStatus(true);
         }
+        setOtpLoading(false)
     }
 
     const ResendOtp = async () => {
-        alert("OTP has been sent")
-        const res = await ForgotPassord(email, newPassword, repeatPassword);
+        setOtpLoading(true)
+        const res = await ForgotPassord({email, newPassword, repeatPassword});
 
         if (res.code >= 400) {
             setModalErrStatus(true);
@@ -99,6 +102,7 @@ function Signin () {
             setModalErrorMsg('');
             setOtpStatus(true);
         }
+        setOtpLoading(false)
     }
 
     const container = {
@@ -163,6 +167,16 @@ function Signin () {
             <Navigation />
             <Title title={title} />
             <Container style={container} >
+                <Modal show={otpLoading}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>LOADING</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <p>OTP is being sent...</p>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    </Modal.Footer>
+                </Modal>
                 <Modal show={showForgot} onHide={() => setShowForgot(false)}>
                     <Modal.Header closeButton>
                         <Modal.Title>NEW PASSWORD</Modal.Title>

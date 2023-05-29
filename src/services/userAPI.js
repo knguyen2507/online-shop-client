@@ -146,7 +146,7 @@ const RefreshToken = async () => {
     }
 };
 
-const Register = async (username, password, email, name, re_password) => {
+const Register = async ({username, password, email, name, repeatPassword}) => {
     const path = '/user/register';
     const url = host + path;
 
@@ -155,7 +155,7 @@ const Register = async (username, password, email, name, re_password) => {
         password: password,
         email: email,
         name: name,
-        re_password: re_password
+        re_password: repeatPassword
     };
 
     try {
@@ -172,12 +172,13 @@ const Register = async (username, password, email, name, re_password) => {
     }  
 };
 
-const RegisterSendOtp = async (otp, password, email, name) => {
+const RegisterSendOtp = async ({otp, password, email, name, username}) => {
     const path = '/user/register/verify-otp';
     const url = host + path;
 
     const payload = {
         otp: otp,
+        username: username,
         password: password,
         email: email,
         name: name
@@ -197,7 +198,7 @@ const RegisterSendOtp = async (otp, password, email, name) => {
     }
 };
 
-const ForgotPassord = async (email, newPassword, repeatPassword) => {
+const ForgotPassord = async ({email, newPassword, repeatPassword}) => {
     const path = '/user/forgot-password';
     const url = host + path;
 
@@ -221,7 +222,7 @@ const ForgotPassord = async (email, newPassword, repeatPassword) => {
     }  
 };
 
-const PasswordSendOtp = async (otp, email, newPassword, repeatPassword) => {
+const PasswordSendOtp = async ({otp, email, newPassword, repeatPassword}) => {
     const path = '/user/forgot-password/verify-otp';
     const url = host + path;
 
