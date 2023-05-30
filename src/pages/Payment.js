@@ -8,9 +8,6 @@ import Button from 'react-bootstrap/Button';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../services/firebase';
 // api
 import {
     RefreshToken
@@ -29,8 +26,6 @@ function Payment () {
     const [errorMsg, setErrorMsg] = useState('');
     const [showView, setShowView] = useState(false);
     const [cartView, setCartView] = useState([]);
-    const [urls, setUrls] = useState([]);
-    const [load, setLoad] = useState(false);
 
     useEffect(() => {
         const getPayment = async () => {
@@ -61,25 +56,6 @@ function Payment () {
         }
         getPayment();
     }, []);
-
-    useEffect(() => {
-        const getUrls = async () => {
-            if (process.env.REACT_APP_ENV === 'pro' && carts.length > 0) {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let cart of carts) {
-                    for (let product of cart.carts) {
-                        const url = await getDownloadURL(ref(storage, product.image));
-                        dict[product.image.toString()] = url
-                    }
-                }
-                setUrls(dict)
-            }
-            setLoad(true)
-        };
-        getUrls();
-    }, [carts])
     
     const cancelPayment = async (idPayment) => {
         const res = await CancelPayment({id: idPayment});
@@ -180,57 +156,49 @@ function Payment () {
         <>
             <Navigation />
             <Container>
-                {
-                    load === false ?
-                    <p 
-                        style={{textAlign: "center", fontWeight: "Bold"}}
-                    >Loading...</p> :
-                    <>
-                        <Modal show={showView} onHide={() => setShowView(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>VIEW</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {cartView.map(product => (
-                                <div style={{borderBottom: "solid 2px"}}>
-                                    <p>Name: {product.name}</p>
-                                    <p>Qty: {product.qty}</p>
-                                    <p>Price: {product.price}</p>
-                                    {process.env.REACT_APP_ENV === 'pro' ? 
-                                        <img 
-                                            width="100" 
-                                            height="100"
-                                            style={{marginTop: "10px"}}
-                                            src={urls[product.image]} 
-                                            alt='image product'
-                                        /> :
-                                        <img 
-                                            width="100" 
-                                            height="100"
-                                            style={{marginTop: "10px"}}
-                                            crossorigin="anonymous"
-                                            src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                            alt='image product'
-                                        />
-                                    }
-                                </div>
-                            ))}
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={() => setShowView(false)}>
-                                Close
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>
-                    <Row style={{borderBottom: "solid 2px"}}>
-                        <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>ID</p></Col>
-                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>TOTAL PRODUCT</p></Col>
-                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>PRICE</p></Col>
-                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
-                    </Row>
-                    {<PaginatedItems carts={carts} />}
-                </>
-                }
+                <Modal show={showView} onHide={() => setShowView(false)}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>VIEW</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {cartView.map(product => (
+                            <div style={{borderBottom: "solid 2px"}}>
+                                <p>Name: {product.name}</p>
+                                <p>Qty: {product.qty}</p>
+                                <p>Price: {product.price}</p>
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        src={urls[product.image]} 
+                                        alt='image product'
+                                    /> :
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                        alt='image product'
+                                    />
+                                }
+                            </div>
+                        ))}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowView(false)}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <Row style={{borderBottom: "solid 2px"}}>
+                    <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>ID</p></Col>
+                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>TOTAL PRODUCT</p></Col>
+                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>PRICE</p></Col>
+                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
+                </Row>
+                {<PaginatedItems carts={carts} />}
             </Container>
             <Footer />
         </>

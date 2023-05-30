@@ -5,9 +5,6 @@ import Col from 'react-bootstrap/Col';
 import { useEffect, useState } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../../services/firebase';
 // api
 import { 
     RefreshToken 
@@ -25,25 +22,6 @@ function Payment(props) {
     const [showView, setShowView] = useState(false);
     const [cartView, setCartView] = useState([]);
     const [user, setUser] = useState([]);
-    const [urls, setUrls] = useState([]);
-    const [load, setLoad] = useState(false);
-
-    useEffect(() => {
-        const getUrls = async () => {
-            if (process.env.REACT_APP_ENV === 'pro' && cartView.length > 0) {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let product of cartView) {
-                    const url = await getDownloadURL(ref(storage, product.image));
-                    dict[product.image.toString()] = url
-                }
-                setUrls(dict)
-            }
-            setLoad(true);
-        };
-        getUrls();
-    }, [cartView])
 
     if (historyPayments.length === 0) {
         paymentNumberPages = 1;
@@ -155,85 +133,77 @@ function Payment(props) {
 
     return (
         <>
-            {
-                load === false ?
-                <p 
-                    style={{textAlign: "center", fontWeight: "Bold"}}
-                >Loading...</p> :
-                <>
-                    <Form className="d-flex justify-content-center" style={{margin: "auto"}}>
-                        <Form.Control
-                            style={{marginTop:"2px", width: "400px"}}
-                            value={key}
-                            type="search"
-                            placeholder="Search"
-                            className="me-2"
-                            aria-label="Search"
-                            onChange={e => setKey(e.target.value)}
-                        />
-                        <Button variant="dark" size="sm" onClick={searchBtn}>SEARCH</Button>
-                    </Form >
-                    <Modal show={showView} onHide={() => setShowView(false)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>VIEW</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <div>
-                                <p>User ID: {user._id}</p>
-                                <p>Username: {user.username}</p>
-                                <p style={{borderBottom: "solid 2px"}}>Name User: {user.name}</p>
-                                {cartView.map(product => (
-                                    <div style={{borderBottom: "solid 2px"}}>
-                                        <p>Name: {product.name}</p>
-                                        <p>Qty: {product.qty}</p>
-                                        <p>Price: {product.price}</p>
-                                        {process.env.REACT_APP_ENV === 'pro' ? 
-                                            <img 
-                                                width="100" 
-                                                height="100"
-                                                style={{marginTop: "10px"}}
-                                                src={urls[product.image]} 
-                                                alt='image product'
-                                            /> :
-                                            <img 
-                                                width="100" 
-                                                height="100"
-                                                style={{marginTop: "10px"}}
-                                                crossorigin="anonymous"
-                                                src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                                alt='image product'
-                                            />
-                                        }
-                                    </div>
-                                ))}
+            <Form className="d-flex justify-content-center" style={{margin: "auto"}}>
+                <Form.Control
+                    style={{marginTop:"2px", width: "400px"}}
+                    value={key}
+                    type="search"
+                    placeholder="Search"
+                    className="me-2"
+                    aria-label="Search"
+                    onChange={e => setKey(e.target.value)}
+                />
+                <Button variant="dark" size="sm" onClick={searchBtn}>SEARCH</Button>
+            </Form >
+            <Modal show={showView} onHide={() => setShowView(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>VIEW</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div>
+                        <p>User ID: {user._id}</p>
+                        <p>Username: {user.username}</p>
+                        <p style={{borderBottom: "solid 2px"}}>Name User: {user.name}</p>
+                        {cartView.map(product => (
+                            <div style={{borderBottom: "solid 2px"}}>
+                                <p>Name: {product.name}</p>
+                                <p>Qty: {product.qty}</p>
+                                <p>Price: {product.price}</p>
+                                {process.env.REACT_APP_ENV === 'pro' ? 
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        src={product.firebase} 
+                                        alt='image product'
+                                    /> :
+                                    <img 
+                                        width="100" 
+                                        height="100"
+                                        style={{marginTop: "10px"}}
+                                        crossorigin="anonymous"
+                                        src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                        alt='image product'
+                                    />
+                                }
                             </div>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={() => setShowView(false)}>
-                                Close
-                            </Button>
-                        </Modal.Footer>
-                    </Modal>           
-                    <Row style={{borderBottom: "solid 2px"}}>
-                        <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>ID</p></Col>
-                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>TOTAL PRODUCT</p></Col>
-                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>PRICE</p></Col>
-                        <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
-                    </Row>
-                    {page === 0 ? <p>page: {page}</p> : paginatedItems}
-                    <Button 
-                        variant="primary" 
-                        style={{width: "200px"}} 
-                        onClick={() => page === 1 ? setPage(page) : setPage(page - 1)}
-                    >Previous</Button>
-                    <p style={{display: "inline-block"}}>{page}</p>
-                    <Button 
-                        variant="success" 
-                        style={{width: "200px"}} 
-                        onClick={() => page === paymentNumberPages ? setPage(page) : setPage(page + 1)}
-                    >Next</Button>
-                </>
-            }
+                        ))}
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowView(false)}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>           
+            <Row style={{borderBottom: "solid 2px"}}>
+                <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>ID</p></Col>
+                <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>TOTAL PRODUCT</p></Col>
+                <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>PRICE</p></Col>
+                <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
+            </Row>
+            {page === 0 ? <p>page: {page}</p> : paginatedItems}
+            <Button 
+                variant="primary" 
+                style={{width: "200px"}} 
+                onClick={() => page === 1 ? setPage(page) : setPage(page - 1)}
+            >Previous</Button>
+            <p style={{display: "inline-block"}}>{page}</p>
+            <Button 
+                variant="success" 
+                style={{width: "200px"}} 
+                onClick={() => page === paymentNumberPages ? setPage(page) : setPage(page + 1)}
+            >Next</Button>
         </>
     )
 }

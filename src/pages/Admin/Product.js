@@ -5,9 +5,6 @@ import Col from 'react-bootstrap/Col';
 import { useEffect, useState } from "react";
 import Modal from 'react-bootstrap/Modal';
 import Cookies from 'js-cookie';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../../services/firebase';
 // api
 import { RefreshToken } from '../../services/userAPI.js';
 import { 

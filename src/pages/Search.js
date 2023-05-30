@@ -7,9 +7,6 @@ import Col from "react-bootstrap/Col";
 import Nav from 'react-bootstrap/Nav';
 import { useState, useEffect } from "react";
 import {useLocation} from 'react-router-dom';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../services/firebase';
 // api
 import { SearchProducts } from "../services/productAPI.js";
 
@@ -20,8 +17,6 @@ function Search () {
     const location = useLocation();
 
     const [products, setProducts] = useState([]);
-    const [urls, setUrls] = useState([]);
-    const [load, setLoad] = useState(false);
 
     const params = new URLSearchParams(location.search);
     const key = params.get('k');
@@ -29,18 +24,7 @@ function Search () {
     useEffect(() => {
         const searchProducts = async (key) => {
             const res = await SearchProducts(key);
-            if (process.env.REACT_APP_ENV === 'pro') {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let product of res.products) {
-                    const url = await getDownloadURL(ref(storage, product.image));
-                    dict[product.image.toString()] = url
-                }
-                setUrls(dict)
-            }
             setProducts(res.products);
-            setLoad(true)
         }
         searchProducts(key);
     }, [])
@@ -64,40 +48,34 @@ function Search () {
             <Navigation />
             <Title title={title} />
             <Container>
-                { 
-                    load === false ?
-                    <p 
-                        style={{textAlign: "center", fontWeight: "Bold"}}
-                    >Loading...</p> :
-                    <Row md={3}>
-                        {products.map(product => (
-                            <Col style={{marginTop: "25px", marginBottom: "25px"}}>
-                                <div style={itemImage}>
-                                    <Nav.Link href={"/product/" + product.id} >
-                                        {process.env.REACT_APP_ENV === 'pro' ? 
-                                            <img 
-                                                width="300" 
-                                                height="300"
-                                                src={urls[product.image]} 
-                                                alt='image product'
-                                            ></img> :
-                                            <img 
-                                                width="300" 
-                                                height="300" 
-                                                crossorigin="anonymous"
-                                                src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                                alt='image product'
-                                            ></img>
-                                        }
-                                    </Nav.Link>
-                                </div>
-                                <div style={itemInfo}>
-                                    <p>{product.name}</p>
-                                </div>
-                            </Col>
-                        ))}
-                    </Row>
-                }
+                <Row md={3}>
+                    {products.map(product => (
+                        <Col style={{marginTop: "25px", marginBottom: "25px"}}>
+                            <div style={itemImage}>
+                                <Nav.Link href={"/product/" + product.id} >
+                                    {process.env.REACT_APP_ENV === 'pro' ? 
+                                        <img 
+                                            width="300" 
+                                            height="300"
+                                            src={product.firebase} 
+                                            alt='image product'
+                                        ></img> :
+                                        <img 
+                                            width="300" 
+                                            height="300" 
+                                            crossorigin="anonymous"
+                                            src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                            alt='image product'
+                                        ></img>
+                                    }
+                                </Nav.Link>
+                            </div>
+                            <div style={itemInfo}>
+                                <p>{product.name}</p>
+                            </div>
+                        </Col>
+                    ))}
+                </Row>
             </Container>
             <Footer />
         </>

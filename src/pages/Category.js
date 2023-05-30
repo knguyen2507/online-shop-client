@@ -8,9 +8,6 @@ import Row from 'react-bootstrap/Row';
 import Col from "react-bootstrap/Col";
 import Nav from 'react-bootstrap/Nav';
 import { useParams } from "react-router-dom";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../services/firebase';
 // api
 import { 
     GetProductsByCategories,
@@ -38,8 +35,6 @@ function Category () {
 
     const [category, setCategory] = useState([]);
     const [products, setProducts] = useState([]);
-    const [urls, setUrls] = useState([]);
-    const [load, setLoad] = useState(false);
     const [numPage, setNumPage] = useState(1);
 
     useEffect(() => {
@@ -52,18 +47,7 @@ function Category () {
     useEffect(() => {
         const getProductsByCategories = async () => {
             const products = await GetProductsByCategories({category: id});
-            if (process.env.REACT_APP_ENV === 'pro') {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let product of products) {
-                    const url = await getDownloadURL(ref(storage, product.image));
-                    dict[product.image.toString()] = url
-                }
-                setUrls(dict)
-            }
             setProducts(products);
-            setLoad(true);
         }
         getProductsByCategories();
     }, [])
@@ -78,53 +62,45 @@ function Category () {
             <Navigation />
             <Title title={title} /> 
             <Container>
-                {
-                    load === false ?
-                    <p 
-                        style={{textAlign: "center", fontWeight: "Bold"}}
-                    >Loading...</p> :
-                    <>
-                        <Row md={3}>
-                            {ItemsPaging[numPage - 1].map(product => (
-                                <Col style={{marginTop: "25px", marginBottom: "25px"}}>
-                                    <div style={itemImage}>
-                                        <Nav.Link href={"/product/" + product.id} >
-                                            {process.env.REACT_APP_ENV === 'pro' ? 
-                                                <img 
-                                                    width="300" 
-                                                    height="300"
-                                                    src={urls[product.image]} 
-                                                    alt='image product'
-                                                ></img> :
-                                                <img 
-                                                    width="300" 
-                                                    height="300" 
-                                                    crossorigin="anonymous"
-                                                    src={process.env.REACT_APP_HOST + '/' + product.image} 
-                                                    alt='image product'
-                                                ></img>
-                                            }
-                                        </Nav.Link>
-                                    </div>
-                                    <div style={itemInfo}>
-                                        <p>{product.name}</p>
-                                    </div>
-                                </Col>
-                            ))}
-                        </Row>
-                        <Button 
-                            variant="primary" 
-                            style={{width: "200px"}} 
-                            onClick={() => numPage === 1 ? setNumPage(numPage) : setNumPage(numPage - 1)}
-                        >Previous</Button>
-                        <p style={{display: "inline-block"}}>{numPage}</p>
-                        <Button 
-                            variant="success" 
-                            style={{width: "200px"}} 
-                            onClick={() => numPage === page ? setNumPage(numPage) : setNumPage(numPage + 1)}
-                        >Next</Button>
-                    </>
-                }
+                <Row md={3}>
+                    {ItemsPaging[numPage - 1].map(product => (
+                        <Col style={{marginTop: "25px", marginBottom: "25px"}}>
+                            <div style={itemImage}>
+                                <Nav.Link href={"/product/" + product.id} >
+                                    {process.env.REACT_APP_ENV === 'pro' ? 
+                                        <img 
+                                            width="300" 
+                                            height="300"
+                                            src={product.firebase} 
+                                            alt='image product'
+                                        ></img> :
+                                        <img 
+                                            width="300" 
+                                            height="300" 
+                                            crossorigin="anonymous"
+                                            src={process.env.REACT_APP_HOST + '/' + product.image} 
+                                            alt='image product'
+                                        ></img>
+                                    }
+                                </Nav.Link>
+                            </div>
+                            <div style={itemInfo}>
+                                <p>{product.name}</p>
+                            </div>
+                        </Col>
+                    ))}
+                </Row>
+                <Button 
+                    variant="primary" 
+                    style={{width: "200px"}} 
+                    onClick={() => numPage === 1 ? setNumPage(numPage) : setNumPage(numPage - 1)}
+                >Previous</Button>
+                <p style={{display: "inline-block"}}>{numPage}</p>
+                <Button 
+                    variant="success" 
+                    style={{width: "200px"}} 
+                    onClick={() => numPage === page ? setNumPage(numPage) : setNumPage(numPage + 1)}
+                >Next</Button>
             </Container>
             <Footer />
         </>

@@ -7,9 +7,6 @@ import Button from 'react-bootstrap/Button';
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../services/firebase';
 // api
 import {
     RefreshToken
@@ -31,8 +28,6 @@ function Cart () {
     const [products, setProducts] = useState([]);
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const [urls, setUrls] = useState([]);
-    const [load, setLoad] = useState(false);
 
     const addQtyProductToCart = async (idCart) => {
         const res = await AddQtyProductInCart({id: idCart});
@@ -176,17 +171,6 @@ function Cart () {
                 setError(false);
                 setProducts(res.metadata);
             }
-            if (process.env.REACT_APP_ENV === 'pro' || res.metadata.length > 0) {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let product of res.metadata) {
-                    const url = await getDownloadURL(ref(storage, product.image));
-                    dict[product.image.toString()] = url
-                }
-                setUrls(dict)
-            }
-            setLoad(true);
         }
         getProducts();
     }, []);
@@ -230,7 +214,7 @@ function Cart () {
                                         width="100" 
                                         height="100"
                                         style={{marginTop: "10px"}}
-                                        src={urls[product.image]} 
+                                        src={product.firebase} 
                                         alt='image product'
                                     /> :
                                     <img 
@@ -277,27 +261,19 @@ function Cart () {
         <>
             <Navigation />
             <Container>
-                {
-                    load === false ?
-                    <p 
-                        style={{textAlign: "center", fontWeight: "Bold"}}
-                    >Loading...</p> :
-                    <>
-                        <Button 
-                            variant="warning" 
-                            style={{width: "300px"}}
-                            onClick={() => paymentCart()}
-                        >PAYMENT PRODUCTS
-                        </Button>
-                        <Row style={{borderBottom: "solid 2px"}}>
-                            <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>NAME</p></Col>
-                            <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>QTY</p></Col>
-                            <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>IMAGE</p></Col>
-                            <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
-                        </Row>
-                        {<PaginatedItems products={products} />}
-                    </>
-                }
+                <Button 
+                    variant="warning" 
+                    style={{width: "300px"}}
+                    onClick={() => paymentCart()}
+                >PAYMENT PRODUCTS
+                </Button>
+                <Row style={{borderBottom: "solid 2px"}}>
+                    <Col xs={9} md={6}><p style={{fontWeight: "bold"}}>NAME</p></Col>
+                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>QTY</p></Col>
+                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>IMAGE</p></Col>
+                    <Col xs={3} md={2}><p style={{fontWeight: "bold"}}>ACTION</p></Col>
+                </Row>
+                {<PaginatedItems products={products} />}
             </Container>
             <Footer />
         </>
