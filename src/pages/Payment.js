@@ -171,7 +171,7 @@ function Payment () {
                                         width="100" 
                                         height="100"
                                         style={{marginTop: "10px"}}
-                                        src={urls[product.image]} 
+                                        src={product.firebase} 
                                         alt='image product'
                                     /> :
                                     <img 
