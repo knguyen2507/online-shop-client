@@ -184,7 +184,7 @@ function Product(props) {
                                         width="100" 
                                         height="100"
                                         style={{marginTop: "10px"}}
-                                        src={urls[product.image]} 
+                                        src={product.firebase} 
                                         alt='image product'
                                     /> :
                                     <img 
@@ -228,8 +228,8 @@ function Product(props) {
                 </>
             )
         }
-        if (load) setPaginatedItems(<PaginatedItems products={props.products} />);
-    }, [page, load]);
+        setPaginatedItems(<PaginatedItems products={props.products} />);
+    }, [page]);
 
     const div = {
         margin: "auto",
