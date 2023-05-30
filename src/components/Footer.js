@@ -17,16 +17,16 @@ export default function Footer() {
     useEffect(() => {
         const getAllBrands = async () => {
             const brands = await GetAllBrands();
-            if (process.env.REACT_APP_ENV === 'pro') {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let brand of brands) {
-                    const url = await getDownloadURL(ref(storage, brand.image));
-                    dict[brand.image.toString()] = url
-                }
-                setUrls(dict)
-            }
+            // if (process.env.REACT_APP_ENV === 'pro') {
+            //     const app = firebase();
+            //     const storage = getStorage(app);
+            //     const dict = {};
+            //     for (let brand of brands) {
+            //         const url = await getDownloadURL(ref(storage, brand.image));
+            //         dict[brand.image.toString()] = url
+            //     }
+            //     setUrls(dict)
+            // }
             setBrands(brands);
         }
         getAllBrands();
@@ -48,7 +48,7 @@ export default function Footer() {
                             <img 
                                 width="120" 
                                 height="50"
-                                src={urls[brand.image]} 
+                                src={brand.firebase} 
                                 alt='image brand'
                             ></img> :
                             <img 
