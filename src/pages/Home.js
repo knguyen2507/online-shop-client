@@ -26,16 +26,16 @@ function Home () {
     useEffect(() => {
         const getAllProducts = async () => {
             const products = await GetAllProducts();
-            if (process.env.REACT_APP_ENV === 'pro') {
-                const app = firebase();
-                const storage = getStorage(app);
-                const dict = {};
-                for (let product of products) {
-                    const url = await getDownloadURL(ref(storage, product.image));
-                    dict[product.image.toString()] = url
-                }
-                setUrls(dict)
-            }
+            // if (process.env.REACT_APP_ENV === 'pro') {
+            //     const app = firebase();
+            //     const storage = getStorage(app);
+            //     const dict = {};
+            //     for (let product of products) {
+            //         const url = await getDownloadURL(ref(storage, product.image));
+            //         dict[product.image.toString()] = url
+            //     }
+            //     setUrls(dict)
+            // }
             setProducts(products);
             setLoad(true)
         }
