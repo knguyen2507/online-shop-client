@@ -2,9 +2,6 @@ import React from 'react';
 import { MDBFooter, MDBContainer, MDBRow, MDBCol, MDBIcon } from 'mdb-react-ui-kit';
 import Nav from 'react-bootstrap/Nav';
 import { useState, useEffect } from "react";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-// firebase
-import { firebase } from '../services/firebase';
 // api
 import { GetAllBrands } from '../services/brandAPI';
 import { GetAllCategories } from '../services/categoryAPI';
@@ -12,21 +9,10 @@ import { GetAllCategories } from '../services/categoryAPI';
 export default function Footer() {
     const [brands, setBrands] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [urls, setUrls] = useState([]);
 
     useEffect(() => {
         const getAllBrands = async () => {
             const brands = await GetAllBrands();
-            // if (process.env.REACT_APP_ENV === 'pro') {
-            //     const app = firebase();
-            //     const storage = getStorage(app);
-            //     const dict = {};
-            //     for (let brand of brands) {
-            //         const url = await getDownloadURL(ref(storage, brand.image));
-            //         dict[brand.image.toString()] = url
-            //     }
-            //     setUrls(dict)
-            // }
             setBrands(brands);
         }
         getAllBrands();
